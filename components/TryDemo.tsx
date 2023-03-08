@@ -7,8 +7,12 @@ export default function TryDemo() {
   const [showError, setShowError] = useState(false);
   const [error, setError] = useState("Enter Url");
   const [data, setData] = useState<{
-    name: string;
+    image: string;
+    title: string;
     price: string;
+    rating: string;
+    totalReviews: string;
+    discount: string;
   }>();
   const [showResult, setShowResult] = useState(false);
   const [validate, setValidate] = useState(false);
@@ -68,12 +72,11 @@ export default function TryDemo() {
     } else {
       setError(await res.text());
     }
-
     setLoading(false);
   };
 
   return (
-    <section className="max-w-3xl mx-auto py-6">
+    <section className="max-w-7xl mx-auto py-6">
       <h2 className="text-2xl font-extrabold tracking-tight text-emerald-100 sm:text-3xl">
         Try Demo
       </h2>
@@ -109,8 +112,8 @@ export default function TryDemo() {
                     .readText()
                     .then((text) => {
                       setShowError(false);
-                      setUrl(text);
                       setValidate(isValidUrl(text));
+                      setUrl(text);
                     })
                     .catch((err) => {
                       setShowError(true);
@@ -170,8 +173,8 @@ export default function TryDemo() {
               </div>
             )}
           </section>
-          {showError && (
-            <div className="mt-2 flex items-center text-xs font-medium text-red-600">
+          {showError ? (
+            <div className="mt-2 flex items-center w-full text-xs font-medium text-red-600">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-4 w-4 text-red-600"
@@ -183,6 +186,24 @@ export default function TryDemo() {
                 />
               </svg>
               <p className="ml-2">{error}</p>
+            </div>
+          ) : (
+            <div className="mt-2 flex items-center w-full text-xs font-medium text-gray-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-gray-300"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"
+                />
+              </svg>
+              <p className="ml-2">
+                {validate
+                  ? "URL is valid"
+                  : "URL is not valid. Please enter a valid URL"}
+              </p>
             </div>
           )}
           <button
@@ -222,39 +243,110 @@ export default function TryDemo() {
           </button>
         </form>
 
-        {/* preview  */}
+        {loading && (
+          <div className="mt-4">
+            <div className="bg-gray-800 rounded-md p-4">
+              <div className="animate-pulse flex space-x-4">
+                <div className="rounded-full bg-gray-400 h-12 w-12"></div>
+                <div className="flex-1 space-y-4 py-1">
+                  <div className="h-4 bg-gray-400 rounded w-3/4"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-400 rounded"></div>
+                    <div className="h-4 bg-gray-400 rounded w-5/6"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showResult && (
           <section className="mt-4">
-            <div className="bg-gray-900 shadow overflow-hidden sm:rounded-lg">
-              <div className="px-4 py-5 sm:px-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-100">
-                  Preview
-                </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-400">
-                  This is a preview of the product you are about to add to the
-                  database.
-                </p>
-              </div>
-              <div className="border-t border-gray-800">
-                <dl className="bg-gradient-to-tl from-gray-700 via-gray-900 to-black">
-                  <div className="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Product Name
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-300 sm:mt-0 sm:col-span-2">
-                      {data?.name}
-                    </dd>
+            <div className="bg-gray-800 rounded-md p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <img
+                    className="h-12 w-12 rounded-full"
+                    src={data?.image}
+                    alt=""
+                  />
+                </div>
+                <div className="ml-4">
+                  <div className="text-base font-medium text-white">
+                    {data?.title}
                   </div>
-                  <div className="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Product Price
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-300 sm:mt-0 sm:col-span-2">
-                      {data?.price}
-                    </dd>
+                  <div
+                    className="text-sm font-medium text-gray-400"
+                    style={{ textDecoration: "line-through" }}
+                  >
+                    {data?.discount}
                   </div>
-                </dl>
+                  <div className="text-sm font-medium text-gray-400">
+                    {data?.price}
+                  </div>
+                  {/* rating or total reviews */}
+                  <div className="flex items-center text-sm font-medium text-gray-400">
+                    {Array(5)
+                      .fill(0)
+                      .map((_, i) => (
+                        <svg
+                          key={i}
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          className="h-4 w-4 text-yellow-400"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="m12 18.275l-4.15 2.5q-.275.175-.575.15t-.525-.2q-.225-.175-.35-.438t-.05-.587l1.1-4.725L3.775 11.8q-.25-.225-.312-.513t.037-.562q.1-.275.3-.45t.55-.225l4.85-.425l1.875-4.45q.125-.3.388-.45t.537-.15q.275 0 .537.15t.388.45l1.875 4.45l4.85.425q.35.05.55.225t.3.45q.1.275.038.563t-.313.512l-3.675 3.175l1.1 4.725q.075.325-.05.588t-.35.437q-.225.175-.525.2t-.575-.15l-4.15-2.5Z"
+                          />
+                        </svg>
+                      ))}
+
+                    <p className="ml-1">{data?.rating}</p>
+                    <p className="ml-1">({data?.totalReviews})</p>
+                  </div>
+                </div>
               </div>
+              {/* add Product button */}
+              <section className="grid grid-cols-2 gap-4 items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    console.log("add product");
+                    // add product to local storage
+                    const product = {
+                      title: data?.title,
+                      image: data?.image,
+                      price: data?.price,
+                      discount: data?.discount,
+                      rating: data?.rating,
+                      totalReviews: data?.totalReviews,
+                      date: new Date().toDateString(),
+                      href: url,
+                    };
+                    const products = JSON.parse(
+                      localStorage.getItem("products") || "[]"
+                    );
+                    products.push(product);
+                    localStorage.setItem("products", JSON.stringify(products));
+
+                    window.location.reload();
+                  }}
+                  className="mt-4 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                >
+                  Track Price
+                </button>
+
+                <button
+                  onClick={() => {
+                    window.location.href = url;
+                  }}
+                  type="button"
+                  className="mt-4 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                >
+                  View More
+                </button>
+              </section>
             </div>
           </section>
         )}
